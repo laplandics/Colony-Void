@@ -1,0 +1,30 @@
+.BG {
+    background-color: rgb(32, 32, 32);
+    flex-grow: 1;
+}
+
+.menu-button {
+    margin-bottom: 30px;
+    margin-top: 30px;
+    margin-left: 30px;
+    margin-right: 30px;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    border-bottom-right-radius: 40px;
+    border-bottom-left-radius: 40px;
+    font-size: 60px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    padding-left: 50px;
+    padding-right: 50px;
+    background-color: rgb(214, 214, 214);
+    transition-property: none;
+    min-width: 280px;
+    max-width: 500px;
+}
+
+.menu-button:hover {
+    background-color: rgb(255, 255, 255);
+}
