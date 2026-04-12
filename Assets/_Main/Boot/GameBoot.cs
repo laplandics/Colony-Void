@@ -4,7 +4,6 @@ using Data;
 using Game.Service;
 using R3;
 using Space;
-using UnityEngine;
 using Utils;
 using View.UI.Game;
 
@@ -17,24 +16,29 @@ namespace Boot
             onExit = new Subject<Unit>();
             
             c.Resolve<CommandProcessor>().Register(new CmdHandlerAddStation(
-                c.Resolve<IDataProvider>().Project.Stations));
+                c.Resolve<IDataProvider>().Project.Entities));
             c.Resolve<CommandProcessor>().Register(new CmdHandlerRemoveStation(
-                c.Resolve<IDataProvider>().Project.Stations));
+                c.Resolve<IDataProvider>().Project.Entities));
+            c.Resolve<CommandProcessor>().Register(new CmdHandlerEarnResource(
+                c.Resolve<IDataProvider>().Project.Resources));
+            c.Resolve<CommandProcessor>().Register(new CmdHandlerSpendResource(
+                c.Resolve<IDataProvider>().Project.Resources));
             
             c.Register(_ => new World(), true);
             c.Register(_ => new Cam("GameCamera"), true);
-            c.Register(_ => new StationCreator(
+            
+            c.Register(_ => new StationService(
                 c.Resolve<CommandProcessor>(),
                 c.Resolve<World>(),
-                c.Resolve<IDataProvider>().Project.Stations), true);
+                c.Resolve<IDataProvider>().Project.Entities), true);
+            c.Register(_ => new ResourceService(
+                c.Resolve<CommandProcessor>(),
+                c.Resolve<UI>(),
+                c.Resolve<IDataProvider>().Project.Resources), true);
             
+            c.Resolve<StationService>();
             c.Resolve<UI>().AddUi(new GameUIVm());
             c.Resolve<Cam>().Instantiate();
-            
-            //
-            Debug.LogWarning("Remove temporal editor code (Game scene)");
-            c.Resolve<StationCreator>().AddStation(Constant.Enums.Stations.Resident, Vector3.zero);
-            //
         }
     }
 }

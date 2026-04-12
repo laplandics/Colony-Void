@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using Constant;
+using Newtonsoft.Json;
 using R3;
+using Settings;
 using UnityEngine;
 
 namespace Data
@@ -19,18 +23,24 @@ namespace Data
         
         private readonly Initializer _initializer;
         
-        private static string Path => Application.persistentDataPath + Constant.Paths.PROJECT_STATE_PATH;
+        private static string Path => Application.persistentDataPath + Paths.PROJECT_STATE_PATH;
 
         public JsonDataProvider(Initializer initializer)
         {
             _initializer = initializer;
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+                Converters = new List<JsonConverter> { new Tools.Vector3Converter() }
+            };
         }
 
         public Observable<bool> LoadData()
         {
             Project = null;
             var state = File.Exists(Path) 
-                ? JsonUtility.FromJson<State.Project>(File.ReadAllText(Path))
+                ? JsonConvert.DeserializeObject<State.Project>(File.ReadAllText(Path))
                 : CreateProjectState();
             
 #if UNITY_EDITOR
@@ -41,13 +51,13 @@ namespace Data
 #endif
             
             Project = new Proxy.Project(state);
-            return Observable.Return(true);
+            return SaveData();
         }
         
         public Observable<bool> SaveData()
         {
             var state = Project.Origin;
-            var json = JsonUtility.ToJson(state, true);
+            var json = JsonConvert.SerializeObject(state, Formatting.Indented);
             File.WriteAllText(Path, json);
             return Observable.Return(true);
         }
@@ -58,6 +68,18 @@ namespace Data
             return state;
         }
     }
-
-    [Serializable] public class Entity { public string id; }
+    
+    public static class EntityFactory
+    {
+        public static Proxy.Entity Create(State.Entity entity)
+        {
+            switch (entity.Type)
+            {
+                case Enums.Entities.Station:
+                    return new Proxy.Station(entity as State.Station);
+                
+                default: throw new Exception($"Unknown entity type: {entity.Type.ToString()}");
+            }
+        }
+    }
 }

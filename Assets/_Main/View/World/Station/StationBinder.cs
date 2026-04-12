@@ -6,7 +6,7 @@ namespace View.Station
     {
         public void Bind(StationVm vm)
         {
-            
+            transform.position = vm.Position.CurrentValue;
         }
     }
 }

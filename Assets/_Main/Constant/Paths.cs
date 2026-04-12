@@ -15,5 +15,6 @@
         public const string CAMERA_PREFAB_PATH = "Cam/Cam";
         
         public const string STATION_DIRECTORY_PATH = "Station/";
+        public const string RESOURCE_DIRECTORY_PATH = "Resource/";
     }
 }

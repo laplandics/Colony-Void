@@ -2,9 +2,13 @@
 {
     public static class Enums
     {
+        public enum Entities
+        {
+            Station
+        }
+        
         public enum Stations
         {
-            Default,
             Command,
             Mining,
             Extraction,

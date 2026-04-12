@@ -1,13 +1,11 @@
-﻿using System;
-using R3;
+﻿using R3;
 
 namespace Data.State
 {
-    [Serializable]
     public class Preferences
     {
-        public int vSync;
-        public int fps;
+        public int VSync { get; set; }
+        public int FPS { get; set; }
     }
 }
 
@@ -24,11 +22,11 @@ namespace Data.Proxy
         {
             Origin = origin;
             
-            VSync = new ReactiveProperty<int>(Origin.vSync);
-            VSync.Skip(1).Subscribe(vSync => Origin.vSync = vSync);
+            VSync = new ReactiveProperty<int>(Origin.VSync);
+            VSync.Skip(1).Subscribe(vSync => Origin.VSync = vSync);
             
-            FPS = new ReactiveProperty<int>(Origin.fps);
-            FPS.Skip(1).Subscribe(fps => Origin.fps = fps);
+            FPS = new ReactiveProperty<int>(Origin.FPS);
+            FPS.Skip(1).Subscribe(fps => Origin.FPS = fps);
         }
     }
 }

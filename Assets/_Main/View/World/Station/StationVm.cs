@@ -1,23 +1,32 @@
 ﻿using UnityEngine;
 using Space;
+using Constant;
+using R3;
 
 namespace View.Station
 {
     public class StationVm : IWorldView
     {
-        private readonly Data.Proxy.Station _proxy;
         private StationBinder _binder;
+        
         public MonoBehaviour Binder => _binder;
-
+        public string ID { get; }
+        public Enums.Entities Type { get; }
+        public Enums.Stations StationType { get; }
+        public ReadOnlyReactiveProperty<Vector3> Position { get; }
+        
         public StationVm(Data.Proxy.Station proxy)
         {
-            _proxy = proxy;
+            ID = proxy.ID;
+            Type = proxy.Type;
+            StationType = proxy.StationType;
+            Position = proxy.Position;
         }
         
         public void OnAdd(Transform root)
         {
-            const string directory = Constant.Paths.STATION_DIRECTORY_PATH;
-            var path = $"{directory}{_proxy.TypeKey.ToString()}/Station";
+            const string directory = Paths.STATION_DIRECTORY_PATH;
+            var path = $"{directory}{StationType.ToString()}/{Type.ToString()}";
             var prefab = Resources.Load<StationBinder>(path);
             var binder = Object.Instantiate(prefab, root, false);
             binder.Bind(this);
