@@ -8,7 +8,7 @@ namespace Cmd
     { public bool Handle(TCommand command); }
     public interface ICommand { }
 
-    public class CommandProcessor
+    public class CommandProcessor : IDisposable
     {
         private readonly Dictionary<Type, object> _handlersMap = new();
         
@@ -27,5 +27,7 @@ namespace Cmd
             var handler = (ICommandHandler<TCommand>)handlerObject;
             return handler.Handle(command);
         }
+
+        public void Dispose() => _handlersMap.Clear();
     }
 }

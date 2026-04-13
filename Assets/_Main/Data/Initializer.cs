@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Constant;
+﻿using System.Linq;
 using Settings;
-using UnityEngine;
 
 namespace Data
 {
@@ -22,42 +18,28 @@ namespace Data
             var preferences = new State.Preferences
             {
                 VSync = _settingsProvider.ApplicationSettings.vSync,
-                FPS = _settingsProvider.ApplicationSettings.fps
+                FPS = _settingsProvider.ApplicationSettings.fps,
+                
+                CamMoveSpeed = _settingsProvider.ApplicationSettings.camMoveSpeed,
+                CamRotateSpeed = _settingsProvider.ApplicationSettings.camRotateSpeed,
+                CamZoomSpeed = _settingsProvider.ApplicationSettings.camZoomSpeed,
+                CamZoomConstrains = _settingsProvider.ApplicationSettings.camZoomConstrains
             };
 
             var initialEntities = projectSettings.initialEntities;
-            var entities = initialEntities.Select(CreateStateFromSettings).ToList();
+            var entities = initialEntities.Select(DataFactory.CreateState).ToList();
 
-            var resources = new List<State.Resource>();
+            var initialUiElements = projectSettings.initialUIElements;
+            var uiElements = initialUiElements.Select(DataFactory.CreateState).ToList();
             
             var state = new State.Project
             {
                 Preferences = preferences,
                 Entities = entities,
-                Resources = resources
+                UIElements = uiElements
             };
             
             return state;
-        }
-
-        private State.Entity CreateStateFromSettings(EntitySettings settings)
-        {
-            switch (settings.entityType)
-            {
-                case Enums.Entities.Station:
-                    if (settings is not StationSettings stationSettings)
-                        throw new Exception($"Invalid entity type: {settings.entityType}");
-                    var state = new State.Station
-                    {
-                        ID = Guid.NewGuid().ToString(),
-                        Position = Vector3.zero,
-                        Type = settings.entityType,
-                        StationType = stationSettings.stationType,
-                    };
-                    return state;
-                
-                default: throw new Exception($"Unknown entity type: {settings.entityType.ToString()}");
-            }
         }
     }
 }

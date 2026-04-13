@@ -1,7 +1,9 @@
-﻿using R3;
-using Space;
+﻿using Cmd;
+using Constant;
+using Data;
+using R3;
+using Service;
 using Utils;
-using View.UI.Menu;
 
 namespace Boot
 {
@@ -11,10 +13,13 @@ namespace Boot
         {
             onExit = new Subject<Unit>();
             
-            c.Register(_ => new Cam("MenuCamera"), true);
+            c.Resolve<CommandProcessor>().Register(new CmdHandlerAddContainer(
+                c.Resolve<IDataProvider>().Project.UIElements));
+            c.Resolve<CommandProcessor>().Register(new CmdHandlerRemoveContainer(
+                c.Resolve<IDataProvider>().Project.UIElements));
             
-            c.Resolve<UI>().AddUi(new MenuUIVm(onExit));
-            c.Resolve<Cam>().Instantiate();
+            c.Resolve<ContainerService>().AddContainer(Enums.Containers.MenuRoot);
+            c.Resolve<Cam>().Instantiate(Enums.Cameras.MenuCam);
         }
     }
 }

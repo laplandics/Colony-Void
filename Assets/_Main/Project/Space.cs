@@ -35,7 +35,8 @@ namespace Space
 
         public void Dispose()
         {
-            foreach (var vm in _currentVms) vm.OnRemove();
+            for (var vmIndex = _currentVms.Count - 1; vmIndex >= 0; vmIndex--)
+            { _currentVms[vmIndex].OnRemove(); }
             _currentVms.Clear();
         }
 
@@ -46,9 +47,12 @@ namespace Space
             public void Init()
             {
                 UIDocument = gameObject.AddComponent<UIDocument>();
-                const string path = Constant.Paths.PROJECT_UI_SETTINGS_PATH;
-                var settings = Resources.Load<PanelSettings>(path);
+                const string settingsPath = Constant.Paths.PROJECT_UI_SETTINGS_PATH;
+                const string assetPath = Constant.Paths.PROJECT_UI_ASSET_PATH;
+                var settings = Resources.Load<PanelSettings>(settingsPath);
+                var rootUiAsset = Resources.Load<VisualTreeAsset>(assetPath);
                 UIDocument.panelSettings = settings;
+                UIDocument.visualTreeAsset = rootUiAsset;
             }
         }
     }
@@ -88,7 +92,6 @@ namespace Space
     public interface IUIView
     {
         public UIDocument Document { get; }
-        public MonoBehaviour Binder { get; }
         
         public void OnAdd(UIDocument document, Transform root, int order);
         public void OnRemove();
@@ -100,5 +103,17 @@ namespace Space
         
         public void OnAdd(Transform root);
         public void OnRemove();
+    }
+
+    public interface IUIBinder<in T> where T : IUIView
+    {
+        public void Bind(T vm);
+        public void Unbind();
+    }
+
+    public interface IWorldBinder<in T> where T : IWorldView
+    {
+        public void Bind(T vm);
+        public void Unbind();
     }
 }

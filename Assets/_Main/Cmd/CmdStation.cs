@@ -4,7 +4,7 @@ using Constant;
 using ObservableCollections;
 using UnityEngine;
 
-namespace Cmd.Game
+namespace Cmd
 {
     public class CmdCommandAddStation : ICommand
     {

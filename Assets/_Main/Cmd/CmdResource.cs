@@ -1,9 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Constant;
 using ObservableCollections;
 using UnityEngine;
 
-namespace Cmd.Game
+namespace Cmd
 {
     public class CmdCommandEarnResource : ICommand
     {
@@ -31,25 +32,33 @@ namespace Cmd.Game
     
     public class CmdHandlerEarnResource : ICommandHandler<CmdCommandEarnResource>
     {
-        private readonly ObservableList<Data.Proxy.Resource> _resources;
+        private readonly ObservableList<Data.Proxy.UIElement> _uiElements;
 
-        public CmdHandlerEarnResource(ObservableList<Data.Proxy.Resource> resources)
+        public CmdHandlerEarnResource(ObservableList<Data.Proxy.UIElement> uiElements)
         {
-            _resources = resources;
+            _uiElements = uiElements;
         }
         
         public bool Handle(CmdCommandEarnResource command)
         {
             var resourceType = command.ResourceType;
             var amount = command.Amount;
-            
-            var res = _resources.FirstOrDefault(resource => resource.TypeKey == resourceType);
-            if (res == null)
+
+            if (_uiElements.FirstOrDefault(element =>
+                    element is Data.Proxy.Resource resource
+                    && resource.ResourceType == resourceType )
+                is not Data.Proxy.Resource res)
             {
                 var state = new Data.State.Resource
-                { ResourceType = resourceType, Amount = 0 };
+                {
+                    ID = Guid.NewGuid().ToString(),
+                    Type = Enums.UIElements.Resource,
+                    Visible = false,
+                    ResourceType = resourceType,
+                    Amount = 0
+                };
                 res = new Data.Proxy.Resource(state);
-                _resources.Add(res);
+                _uiElements.Add(res);
             }
             
             res.Amount.Value += amount;
@@ -59,11 +68,11 @@ namespace Cmd.Game
     
     public class CmdHandlerSpendResource : ICommandHandler<CmdCommandSpendResource>
     {
-        private readonly ObservableList<Data.Proxy.Resource> _resources;
+        private readonly ObservableList<Data.Proxy.UIElement> _uiElements;
         
-        public CmdHandlerSpendResource(ObservableList<Data.Proxy.Resource> resources)
+        public CmdHandlerSpendResource(ObservableList<Data.Proxy.UIElement> uiElements)
         {
-            _resources = resources;
+            _uiElements = uiElements;
         }
         
         public bool Handle(CmdCommandSpendResource command)
@@ -71,8 +80,10 @@ namespace Cmd.Game
             var resourceType = command.TypeKey;
             var amount = command.Amount;
             
-            var res = _resources.FirstOrDefault(resource => resource.TypeKey == resourceType);
-            if (res == null)
+            if (_uiElements.FirstOrDefault(element =>
+                    element is Data.Proxy.Resource resource
+                    && resource.ResourceType == resourceType)
+                is not Data.Proxy.Resource res)
             {
                 Debug.LogError($"Trying to spend resource {resourceType}, which doesn't exist");
                 return false;

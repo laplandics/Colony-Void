@@ -1,6 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using Constant;
+using Data.Proxy;
+using R3;
+using Tools;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace Utils
 {
@@ -35,29 +41,55 @@ namespace Utils
     {
         public static IEnumerator Load(string sceneName)
         {
-            yield return SceneManager.LoadSceneAsync(Constant.Names.BOOT_SCENE_NAME);
+            yield return SceneManager.LoadSceneAsync(Names.BOOT_SCENE_NAME);
             yield return null;
             yield return SceneManager.LoadSceneAsync(sceneName);
             yield return null;
         }
     }
 
-    public class Cam
+    public class Cam : IDisposable
     {
-        private readonly string _camName;
+        private readonly Preferences _prefs;
+        private CompositeDisposable _disposables = new();
         
-        public Cam(string name) { _camName = name; }
+        public GameObject GetObject { get; private set; }
+        public Camera GetCamera { get; private set; }
         
-        public void Instantiate()
+        public Cam(Preferences prefs = null)
         {
-            var camPref = Resources.Load<GameObject>(Constant.Paths.CAMERA_PREFAB_PATH);
-            var cam = Object.Instantiate(camPref);
-            cam.name = _camName;
-            cam.tag = "MainCamera";
-            Get = cam.GetComponentInChildren<Camera>();
-            Resources.UnloadUnusedAssets();
+            _prefs = prefs;
         }
         
-        public Camera Get { get; private set; }
+        public void Instantiate(Enums.Cameras type)
+        {
+            var camName = type.ToString();
+            const string directory = Paths.CAMERA_DIRECTORY_PATH;
+            var path = directory + camName;
+            var camPref = Resources.Load<GameObject>(path);
+            GetObject = Object.Instantiate(camPref);
+            GetObject.name = camName;
+            GetCamera = GetObject.GetComponentInChildren<Camera>();
+            GetCamera.tag = "MainCamera";
+            Resources.UnloadUnusedAssets();
+            if (GetObject.TryGetComponent<CameraController>(out var controller))
+            { InitializeController(controller); }
+        }
+
+        private void InitializeController(CameraController controller)
+        {
+            if (_prefs == null) throw new Exception("Camera has a CameraController, but preferences are missing");
+            _disposables.Add( _prefs.CamMoveSpeed.Subscribe(value => controller.moveSpeed = value));
+            _disposables.Add(_prefs.CamRotateSpeed.Subscribe(value => controller.rotateSpeed = value));
+            _disposables.Add(_prefs.CamZoomSpeed.Subscribe(value => controller.zoomSpeed = value));
+            _disposables.Add(_prefs.CamZoomConstrains.Subscribe(value => controller.zoomConstrains = value));
+        }
+
+        public void Dispose()
+        {
+            _disposables.Dispose();
+            Object.Destroy(GetObject);
+        }
+        
     }
 }

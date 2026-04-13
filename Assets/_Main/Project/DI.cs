@@ -45,11 +45,10 @@ public class DI
             
             throw new Exception($"Requested type {typeof(T)} was not registered");
         }
-        
+
         public void Dispose()
         { foreach (var entry in _entriesMap.Values) entry.Dispose(); }
         
-
         private class DIEntry : IDisposable
         {
             public void Dispose()

@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using Cmd;
-using Cmd.Game;
 using Constant;
 using ObservableCollections;
 using R3;
 using Space;
 using UnityEngine;
-using View.Station;
+using View.World.Station;
 
-namespace Game.Service
+namespace Service
 {
     public class StationService
     {

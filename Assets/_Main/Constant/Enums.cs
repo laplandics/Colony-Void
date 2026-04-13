@@ -2,9 +2,17 @@
 {
     public static class Enums
     {
+        public enum Cameras
+        {
+            BootCam,
+            MenuCam,
+            GameCam,
+        }
+        
         public enum Entities
         {
-            Station
+            Station,
+            Order
         }
         
         public enum Stations
@@ -19,6 +27,28 @@
             Science,
             Yard,
             Resident
+        }
+        
+        public enum UIElements
+        {
+            Container,
+            Resource,
+            Order
+        }
+
+        public enum Containers
+        {
+            //Root
+            BootRoot,
+            MenuRoot,
+            GameRoot,
+            
+            //Window
+            GameMenuWindow,
+            
+            //Popup
+            
+            //Token
         }
         
         public enum Resources

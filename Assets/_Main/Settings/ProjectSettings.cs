@@ -7,5 +7,6 @@ namespace Settings
     public class ProjectSettings : ScriptableObject
     {
         public List<EntitySettings> initialEntities;
+        public List<UIElementSettings> initialUIElements;
     }
 }
