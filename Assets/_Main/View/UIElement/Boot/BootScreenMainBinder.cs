@@ -1,4 +1,4 @@
-﻿namespace View.UI.Element
+﻿namespace View.UIElement.Boot
 {
     public class BootScreenMainBinder : UIElementBinder<BootScreenMainVm>
     {

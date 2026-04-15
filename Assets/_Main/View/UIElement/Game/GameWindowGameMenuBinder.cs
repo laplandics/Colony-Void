@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace View.UI.Element
+namespace View.UIElement.Game
 {
     public class GameWindowGameMenuBinder : WindowBinder<GameWindowGameMenuVm>
     {

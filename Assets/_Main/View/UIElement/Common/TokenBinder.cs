@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace View.UI.Element
+namespace View.UIElement
 {
     public abstract class TokenBinder<T> : UIElementBinder<T> where T : UIElementVm
     {

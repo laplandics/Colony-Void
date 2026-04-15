@@ -3,7 +3,7 @@ using R3;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace View.UI.Element
+namespace View.UIElement
 {
     public abstract class UIElementVm
     {

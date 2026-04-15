@@ -2,7 +2,7 @@
 using R3;
 using UnityEngine;
 
-namespace View.UI.Element
+namespace View.UIElement
 {
     public class UIRootBinder : MonoBehaviour
     {

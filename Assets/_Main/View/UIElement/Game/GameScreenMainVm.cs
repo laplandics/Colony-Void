@@ -2,28 +2,26 @@
 using R3;
 using Service;
 
-namespace View.UI.Element
+namespace View.UIElement.Game
 {
     public class GameScreenMainVm : UIElementVm
     {
-        private readonly UIEGameService _service;
-        private readonly Subject<Unit> _onExit;
+        private readonly GameRootVm _root;
         public override Enums.UIElements Key => Enums.UIElements.GameScreenMain;
 
-        public GameScreenMainVm(UIEGameService service, Subject<Unit> onExit)
+        public GameScreenMainVm(GameRootVm root)
         {
-            _service = service;
-            _onExit = onExit;
+            _root = root;
         }
         
         public void InvokeOpenWindowGameMenu()
         {
-            
+            _root.OpenWindowGameMenu();
         }
 
         public void InvokeCloseWindowGameMenu()
         {
-            
+            _root.CloseWindowGameMenu();
         }
     }
 }

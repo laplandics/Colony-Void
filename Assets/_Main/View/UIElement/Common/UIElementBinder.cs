@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace View.UI.Element
+namespace View.UIElement
 {
     public abstract class UIElementBinder<T> : MonoBehaviour, IUIElementBinder where T : UIElementVm
     {

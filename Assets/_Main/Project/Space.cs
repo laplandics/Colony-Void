@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using View.UI.Element;
+using View.UIElement;
 using Object = UnityEngine.Object;
 
 namespace Space
@@ -17,16 +17,17 @@ namespace Space
             _uiSpace = space.transform;
         }
         
-        public void AddRoot(UIRootVm rootVm)
+        public T AddRoot<T>(T rootVm) where T : UIRootVm
         {
-            _currentRoot?.OnRemove();
-            rootVm.OnAdd(_uiSpace);
             _currentRoot = rootVm;
+            _currentRoot.OnAdd(_uiSpace);
+            return rootVm;
         }
-
+        
         public void Dispose()
         {
             _currentRoot?.OnRemove();
+            _currentRoot = null;
         }
     }
 

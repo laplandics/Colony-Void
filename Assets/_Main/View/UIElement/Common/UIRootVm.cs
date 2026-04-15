@@ -7,9 +7,9 @@ using R3;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace View.UI.Element
+namespace View.UIElement
 {
-    public class UIRootVm
+    public abstract class UIRootVm
     {
         private readonly Enums.UIElements _rootType;
         
@@ -24,7 +24,7 @@ namespace View.UI.Element
         public IObservableCollection<UIElementVm> Tokens => _tokens;
         public IObservableCollection<UIElementVm> Windows => _windows;
 
-        public UIRootVm(Enums.UIElements rootType)
+        protected UIRootVm(Enums.UIElements rootType)
         {
             _rootType = rootType;
         }
@@ -42,17 +42,18 @@ namespace View.UI.Element
         {
             CloseAll();
             _screen.Value?.OnRemove();
+            _screen.Value = null;
             Binder.Unbind();
             Object.Destroy(Binder.gameObject);
         }
         
-        public void OpenScreen(UIElementVm screenVm)
+        protected void OpenScreen(UIElementVm screenVm)
         {
             _screen.Value?.OnRemove();
             _screen.Value = screenVm;
         }
 
-        public void OpenToken(UIElementVm tokenVm)
+        protected void OpenToken(UIElementVm tokenVm)
         {
             if (_tokens.Contains(tokenVm))
             { Debug.LogWarning($"Trying to open token, that already exists {tokenVm.Key}"); return; }
@@ -61,7 +62,7 @@ namespace View.UI.Element
             _tokens.Add(tokenVm);
         }
 
-        public void OpenWindow(UIElementVm windowVm)
+        protected void OpenWindow(UIElementVm windowVm)
         {
             if (_windows.Contains(windowVm))
             { Debug.LogWarning($"Trying to open window, that already exists {windowVm.Key}"); return; }
@@ -70,7 +71,7 @@ namespace View.UI.Element
             _windows.Add(windowVm);
         }
 
-        public void CloseToken(Enums.UIElements tokenKey)
+        protected void CloseToken(Enums.UIElements tokenKey)
         {
             var token = _windows.FirstOrDefault(token => token.Key == tokenKey);
             if (token == null) return;
@@ -78,7 +79,7 @@ namespace View.UI.Element
             DisposeUIElement(token);
         }
 
-        public void CloseWindow(Enums.UIElements windowKey)
+        protected void CloseWindow(Enums.UIElements windowKey)
         {
             var window = _windows.FirstOrDefault(window => window.Key == windowKey);
             if (window == null) return;
@@ -86,21 +87,21 @@ namespace View.UI.Element
             DisposeUIElement(window);
         }
 
-        public void CloseAllTokens()
+        protected void CloseAllTokens()
         {
             foreach (var token in _tokens)
             { DisposeUIElement(token); }
             _tokens.Clear();
         }
 
-        public void CloseAllWindows()
+        protected void CloseAllWindows()
         {
             foreach (var window in _windows)
             { DisposeUIElement(window); }
             _windows.Clear();
         }
 
-        public void CloseAll()
+        protected void CloseAll()
         {
             CloseAllTokens();
             CloseAllWindows();

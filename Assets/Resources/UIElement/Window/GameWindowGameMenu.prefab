@@ -751,7 +751,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85a1d31433d44e4e9a07124b1d7b0579, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::View.UI.Element.GameWindowGameMenuBinder
-  dragButton: {fileID: 410408118283357802}
+  dragModule: {fileID: 5251741226815502149}
   closeButton: {fileID: 971388837869261542}
   menuExitButton: {fileID: 5282563658558531686}
   settingsButton: {fileID: 6818052424123670761}
@@ -1089,17 +1089,6 @@ PrefabInstance:
       addedObject: {fileID: 6744713164318084811}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 107c979917e5caf418aaaa9e15e575b2, type: 3}
---- !u!114 &410408118283357802 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7410811920481540320, guid: 107c979917e5caf418aaaa9e15e575b2, type: 3}
-  m_PrefabInstance: {fileID: 7163659306078770826}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!114 &971388837869261542 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7931260260718019692, guid: 107c979917e5caf418aaaa9e15e575b2, type: 3}
@@ -1116,6 +1105,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 9182277201712873049, guid: 107c979917e5caf418aaaa9e15e575b2, type: 3}
   m_PrefabInstance: {fileID: 7163659306078770826}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5251741226815502149 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3137743389544653263, guid: 107c979917e5caf418aaaa9e15e575b2, type: 3}
+  m_PrefabInstance: {fileID: 7163659306078770826}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c65c256f7224aec840971586177f333, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Module.UIElement.DragModule
 --- !u!224 &6252370197772889872 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3868187178928634266, guid: 107c979917e5caf418aaaa9e15e575b2, type: 3}

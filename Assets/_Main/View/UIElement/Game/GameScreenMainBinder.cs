@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace View.UI.Element
+namespace View.UIElement.Game
 {
     public class GameScreenMainBinder : UIElementBinder<GameScreenMainVm>
     {
         [SerializeField] private Button windowGameMenuButton;
-        
-        private readonly bool _windowGameMenuOpened;
+
+        private GameWindowGameMenuVm _gameMenuWindow;
         
         protected override void OnBind()
         {
@@ -16,14 +16,7 @@ namespace View.UI.Element
 
         private void OnWindowGameMenuButtonClicked()
         {
-            if (!_windowGameMenuOpened)
-            {
-                Vm.InvokeOpenWindowGameMenu();
-            }
-            else
-            {
-                Vm.InvokeCloseWindowGameMenu();
-            }
+            Vm.InvokeOpenWindowGameMenu();
         }
 
         protected override void OnUnbind()

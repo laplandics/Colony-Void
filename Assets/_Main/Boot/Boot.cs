@@ -4,13 +4,12 @@ using Cmd;
 using Constant;
 using Data;
 using R3;
-using Service;
 using Settings;
 using Space;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utils;
-using View.UI.Element;
+using View.UIElement.Boot;
 
 namespace Boot
 {
@@ -26,13 +25,10 @@ namespace Boot
             di.Register(_ => new Scenes(), true);
             di.Register(_ => new Coroutines(), true);
             di.Register(_ => new CommandProcessor(), true);
-            di.Register(_ => new UIRootVm(Enums.UIElements.BootRoot), true);
             di.Register<ISettingsProvider>(_ => new SoSettingsProvider(), true);
             di.Register(_ => new Initializer(di.Resolve<ISettingsProvider>()), true);
             di.Register(_ => new Cam(di.Resolve<IDataProvider>().Project.Preferences), true);
             di.Register<IDataProvider>(_ => new JsonDataProvider(di.Resolve<Initializer>()), true);
-
-            di.Register(_ => new UIEBootService(di.Resolve<UIRootVm>(), di.Resolve<UI>()), true);
     
 #if UNITY_EDITOR
                 
@@ -91,8 +87,8 @@ namespace Boot
             
             rootDi.Dispose();
             yield return null;
-            
-            rootDi.Resolve<UIEBootService>().OpenScreen();
+
+            rootDi.Resolve<UI>().AddRoot(new BootRootVm()).OpenBootScreen();
             rootDi.Resolve<Cam>().Instantiate(Enums.Cameras.BootCam);
             
             yield return new WaitForSeconds(0.2f);

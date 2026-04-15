@@ -2,18 +2,21 @@
 using R3;
 using Service;
 
-namespace View.UI.Element
+namespace View.UIElement.Menu
 {
     public class MenuScreenMainVm : UIElementVm
     {
-        private readonly UIEMenuService _service;
         private readonly Subject<Unit> _onExit;
         public override Enums.UIElements Key => Enums.UIElements.MenuScreenMain;
 
-        public MenuScreenMainVm(UIEMenuService service, Subject<Unit> onExit)
+        public MenuScreenMainVm(Subject<Unit> onExit)
         {
-            _service = service;
             _onExit = onExit;
+        }
+
+        public void InvokeStartGame()
+        {
+            _onExit.OnNext(Unit.Default);
         }
     }
 }

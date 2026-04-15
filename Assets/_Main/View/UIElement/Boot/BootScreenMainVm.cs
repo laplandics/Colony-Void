@@ -1,6 +1,6 @@
 ﻿using Constant;
 
-namespace View.UI.Element
+namespace View.UIElement.Boot
 {
     public class BootScreenMainVm : UIElementVm
     {
