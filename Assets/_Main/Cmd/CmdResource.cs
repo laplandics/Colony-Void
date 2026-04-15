@@ -1,12 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Constant;
 using ObservableCollections;
 using UnityEngine;
 
 namespace Cmd
 {
-    public class CmdCommandEarnResource : ICommand
+    public class CmdCommandEarnResource : Command
     {
         public Enums.Resources ResourceType { get; }
         public int Amount { get; }
@@ -18,7 +17,7 @@ namespace Cmd
         }
     }
 
-    public class CmdCommandSpendResource : ICommand
+    public class CmdCommandSpendResource : Command
     {
         public Enums.Resources TypeKey { get; }
         public int Amount { get; }
@@ -32,11 +31,11 @@ namespace Cmd
     
     public class CmdHandlerEarnResource : ICommandHandler<CmdCommandEarnResource>
     {
-        private readonly ObservableList<Data.Proxy.UIElement> _uiElements;
+        private readonly ObservableList<Data.Proxy.Resource> _resources;
 
-        public CmdHandlerEarnResource(ObservableList<Data.Proxy.UIElement> uiElements)
+        public CmdHandlerEarnResource(ObservableList<Data.Proxy.Resource> resources)
         {
-            _uiElements = uiElements;
+            _resources = resources;
         }
         
         public bool Handle(CmdCommandEarnResource command)
@@ -44,21 +43,16 @@ namespace Cmd
             var resourceType = command.ResourceType;
             var amount = command.Amount;
 
-            if (_uiElements.FirstOrDefault(element =>
-                    element is Data.Proxy.Resource resource
-                    && resource.ResourceType == resourceType )
-                is not Data.Proxy.Resource res)
+            var res = _resources.FirstOrDefault(resource => resource.ResourceType == resourceType);
+            if (res == null)
             {
                 var state = new Data.State.Resource
                 {
-                    ID = Guid.NewGuid().ToString(),
-                    Type = Enums.UIElements.Resource,
-                    Visible = false,
                     ResourceType = resourceType,
                     Amount = 0
                 };
                 res = new Data.Proxy.Resource(state);
-                _uiElements.Add(res);
+                _resources.Add(res);
             }
             
             res.Amount.Value += amount;
@@ -68,11 +62,11 @@ namespace Cmd
     
     public class CmdHandlerSpendResource : ICommandHandler<CmdCommandSpendResource>
     {
-        private readonly ObservableList<Data.Proxy.UIElement> _uiElements;
+        private readonly ObservableList<Data.Proxy.Resource> _resources;
         
-        public CmdHandlerSpendResource(ObservableList<Data.Proxy.UIElement> uiElements)
+        public CmdHandlerSpendResource(ObservableList<Data.Proxy.Resource> resources)
         {
-            _uiElements = uiElements;
+            _resources = resources;
         }
         
         public bool Handle(CmdCommandSpendResource command)
@@ -80,10 +74,8 @@ namespace Cmd
             var resourceType = command.TypeKey;
             var amount = command.Amount;
             
-            if (_uiElements.FirstOrDefault(element =>
-                    element is Data.Proxy.Resource resource
-                    && resource.ResourceType == resourceType)
-                is not Data.Proxy.Resource res)
+            var res = _resources.FirstOrDefault(resource => resource.ResourceType == resourceType);
+            if (res == null)
             {
                 Debug.LogError($"Trying to spend resource {resourceType}, which doesn't exist");
                 return false;

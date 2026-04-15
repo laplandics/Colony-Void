@@ -12,7 +12,6 @@
         public enum Entities
         {
             Station,
-            Order
         }
         
         public enum Stations
@@ -28,27 +27,24 @@
             Yard,
             Resident
         }
-        
+
         public enum UIElements
         {
-            Container,
-            Resource,
-            Order
-        }
-
-        public enum Containers
-        {
             //Root
-            BootRoot,
-            MenuRoot,
-            GameRoot,
+            BootRoot = 10,
+            MenuRoot = 11,
+            GameRoot = 12,
             
-            //Window
-            GameMenuWindow,
-            
-            //Popup
+            //Screen
+            GameScreenMain = 20,
+            BootScreenMain = 21,
+            MenuScreenMain = 22,
             
             //Token
+            
+            //Window
+            GameWindowGameMenu = 40
+            
         }
         
         public enum Resources
@@ -56,23 +52,23 @@
             //Raws
             Ore,
             Biomass,
-            Chemicals,
+            Chemical,
         
             //Materials
-            Metals,
-            Polymers,
-            Minerals,
+            Metal,
+            Polymer,
+            Mineral,
             Fuel,
-            Fertilizers,
-            Biomaterials,
+            Fertilizer,
+            Biomaterial,
         
             //Products
-            Electronics,
-            Composites,
+            Electronic,
+            Composite,
             Food,
-            Weapons,
-            BuildingMaterials,
-            Goods
+            Weapon,
+            BuildingMaterial,
+            GeneralGood
         }
     }
 }

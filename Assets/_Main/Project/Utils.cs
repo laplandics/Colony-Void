@@ -41,7 +41,7 @@ namespace Utils
     {
         public static IEnumerator Load(string sceneName)
         {
-            yield return SceneManager.LoadSceneAsync(Names.BOOT_SCENE_NAME);
+            yield return SceneManager.LoadSceneAsync(Names.Scenes.BOOT);
             yield return null;
             yield return SceneManager.LoadSceneAsync(sceneName);
             yield return null;
@@ -90,6 +90,5 @@ namespace Utils
             _disposables.Dispose();
             Object.Destroy(GetObject);
         }
-        
     }
 }

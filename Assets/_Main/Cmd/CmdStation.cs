@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Cmd
 {
-    public class CmdCommandAddStation : ICommand
+    public class CmdCommandAddStation : Command
     {
         public Enums.Stations StationType { get; }
         public Vector3 Position { get; }
@@ -18,7 +18,7 @@ namespace Cmd
         }
     }
 
-    public class CmdCommandRemoveStation : ICommand
+    public class CmdCommandRemoveStation : Command
     {
         public string ID { get; }
 

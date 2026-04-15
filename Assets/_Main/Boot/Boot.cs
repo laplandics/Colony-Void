@@ -6,10 +6,11 @@ using Data;
 using R3;
 using Service;
 using Settings;
-using UnityEngine;
 using Space;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utils;
+using View.UI.Element;
 
 namespace Boot
 {
@@ -21,45 +22,42 @@ namespace Boot
         private ProjectBoot()
         {
             var di = new DI();
-            di.Register(_ => new Coroutines(), true);
-            di.Register(_ => new Scenes(), true);
             di.Register(_ => new UI(), true);
+            di.Register(_ => new Scenes(), true);
+            di.Register(_ => new Coroutines(), true);
+            di.Register(_ => new CommandProcessor(), true);
+            di.Register(_ => new UIRootVm(Enums.UIElements.BootRoot), true);
             di.Register<ISettingsProvider>(_ => new SoSettingsProvider(), true);
             di.Register(_ => new Initializer(di.Resolve<ISettingsProvider>()), true);
-            di.Register<IDataProvider>(_ => new JsonDataProvider(di.Resolve<Initializer>()), true);
             di.Register(_ => new Cam(di.Resolve<IDataProvider>().Project.Preferences), true);
-            di.Register(_ => new CommandProcessor(), true);
-            
-            di.Register(_ => new ContainerService(
-                di.Resolve<CommandProcessor>(),
-                di.Resolve<UI>(),
-                di.Resolve<IDataProvider>().Project.UIElements), true);
-            
-    #if UNITY_EDITOR
+            di.Register<IDataProvider>(_ => new JsonDataProvider(di.Resolve<Initializer>()), true);
+
+            di.Register(_ => new UIEBootService(di.Resolve<UIRootVm>(), di.Resolve<UI>()), true);
+    
+#if UNITY_EDITOR
                 
             Debug.LogWarning("Remove temporal editor code (Boot scene)");
             var sceneName = SceneManager.GetActiveScene().name;
             switch (sceneName)
             {
-                case Names.MENU_SCENE_NAME:
+                case Names.Scenes.MENU:
                     di.Resolve<Coroutines>().Start(LoadMenu(di), out _); return;
                     
-                case Names.GAME_SCENE_NAME:
+                case Names.Scenes.GAME:
                     di.Resolve<Coroutines>().Start(LoadGame(di), out _); return;
             }
 
-            if (sceneName != Names.BOOT_SCENE_NAME) return;
+            if (sceneName != Names.Scenes.BOOT) return;
                 
-    #endif
+#endif
             
             di.Resolve<Coroutines>().Start(LoadMenu(di), out _);
         }
 
-        private IEnumerator BeforeLoad(DI rootDi)
+        private bool _isProjectInitialized;
+        
+        private IEnumerator BeforeFirstLoad(DI rootDi)
         {
-            rootDi.Dispose();
-            yield return null;
-            
             var loadSettingsRequest = rootDi.Resolve<ISettingsProvider>().LoadSettings();
             yield return new WaitUntil(() => loadSettingsRequest.IsCompleted);
             if (loadSettingsRequest.IsFaulted || !loadSettingsRequest.Result)
@@ -72,23 +70,41 @@ namespace Boot
             var preferences = rootDi.Resolve<IDataProvider>().Project.Preferences;
             QualitySettings.vSyncCount = preferences.VSync.Value;
             Application.targetFrameRate = preferences.FPS.Value;
-
-            rootDi.Resolve<CommandProcessor>().Register(new CmdHandlerAddContainer(
-                rootDi.Resolve<IDataProvider>().Project.UIElements));
-            rootDi.Resolve<CommandProcessor>().Register(new CmdHandlerRemoveContainer(
-                rootDi.Resolve<IDataProvider>().Project.UIElements));
             
-            rootDi.Resolve<ContainerService>().AddContainer(Enums.Containers.BootRoot);
+            rootDi.Resolve<CommandProcessor>().Register(new CmdHandlerAddStation(
+                rootDi.Resolve<IDataProvider>().Project.Entities));
+            rootDi.Resolve<CommandProcessor>().Register(new CmdHandlerRemoveStation(
+                rootDi.Resolve<IDataProvider>().Project.Entities));
+            
+            rootDi.Resolve<CommandProcessor>().Register(new CmdHandlerEarnResource(
+                rootDi.Resolve<IDataProvider>().Project.Resources));
+            rootDi.Resolve<CommandProcessor>().Register(new CmdHandlerSpendResource(
+                rootDi.Resolve<IDataProvider>().Project.Resources));
+            
+            _isProjectInitialized = true;
+            yield return null;
+        }
+        
+        private IEnumerator BeforeEveryLoad(DI rootDi, string sceneName)
+        {
+            if (!_isProjectInitialized) yield return BeforeFirstLoad(rootDi);
+            
+            rootDi.Dispose();
+            yield return null;
+            
+            rootDi.Resolve<UIEBootService>().OpenScreen();
             rootDi.Resolve<Cam>().Instantiate(Enums.Cameras.BootCam);
+            
             yield return new WaitForSeconds(0.2f);
+            yield return Scenes.Load(sceneName);
+            
+            yield return null;
         }
         
         private IEnumerator LoadMenu(DI rootDi)
         {
-            yield return BeforeLoad(rootDi);
-            yield return Scenes.Load(Names.MENU_SCENE_NAME);
+            yield return BeforeEveryLoad(rootDi, Names.Scenes.MENU);
             
-            yield return null;
             rootDi.Dispose();
             var sceneDi = new DI(rootDi);
             
@@ -99,10 +115,8 @@ namespace Boot
 
         private IEnumerator LoadGame(DI rootDi)
         {
-            yield return BeforeLoad(rootDi);
-            yield return Scenes.Load(Names.GAME_SCENE_NAME);
+            yield return BeforeEveryLoad(rootDi, Names.Scenes.GAME);
             
-            yield return null;
             rootDi.Dispose();
             var sceneDi = new DI(rootDi);
             

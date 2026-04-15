@@ -1,9 +1,9 @@
-﻿using Cmd;
-using Constant;
-using Data;
+﻿using Constant;
 using R3;
 using Service;
+using Space;
 using Utils;
+using View.UI.Element;
 
 namespace Boot
 {
@@ -11,15 +11,18 @@ namespace Boot
     {
         public void Boot(DI c, out Subject<Unit> onExit)
         {
-            onExit = new Subject<Unit>();
+            var exitSubject = new Subject<Unit>();
             
-            c.Resolve<CommandProcessor>().Register(new CmdHandlerAddContainer(
-                c.Resolve<IDataProvider>().Project.UIElements));
-            c.Resolve<CommandProcessor>().Register(new CmdHandlerRemoveContainer(
-                c.Resolve<IDataProvider>().Project.UIElements));
+            c.Register(_ => new UIRootVm(Enums.UIElements.MenuRoot), true);
+            c.Register(_ => new UIEMenuService(
+                c.Resolve<UIRootVm>(),
+                c.Resolve<UI>(),
+                exitSubject), true);
             
-            c.Resolve<ContainerService>().AddContainer(Enums.Containers.MenuRoot);
+            c.Resolve<UIEMenuService>().OpenScreen();
             c.Resolve<Cam>().Instantiate(Enums.Cameras.MenuCam);
+            
+            onExit = exitSubject;
         }
     }
 }

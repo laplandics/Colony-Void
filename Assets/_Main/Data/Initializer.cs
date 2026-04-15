@@ -29,14 +29,14 @@ namespace Data
             var initialEntities = projectSettings.initialEntities;
             var entities = initialEntities.Select(DataFactory.CreateState).ToList();
 
-            var initialUiElements = projectSettings.initialUIElements;
-            var uiElements = initialUiElements.Select(DataFactory.CreateState).ToList();
+            var initialResources = projectSettings.initialResources;
+            var resources = initialResources.Select(DataFactory.CreateState).ToList();
             
             var state = new State.Project
             {
                 Preferences = preferences,
                 Entities = entities,
-                UIElements = uiElements
+                Resources = resources,
             };
             
             return state;

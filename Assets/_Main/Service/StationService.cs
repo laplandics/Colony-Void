@@ -1,24 +1,18 @@
-﻿using System.Collections.Generic;
-using Cmd;
+﻿using Cmd;
 using Constant;
 using ObservableCollections;
 using R3;
-using Space;
 using UnityEngine;
-using View.World.Station;
 
 namespace Service
 {
     public class StationService
     {
         private readonly CommandProcessor _cmd;
-        private readonly World _root;
-        private readonly Dictionary<string, StationVm> _stationsVmsMap = new();
 
-        public StationService(CommandProcessor cmd, World root, ObservableList<Data.Proxy.Entity> entities)
+        public StationService(CommandProcessor cmd, ObservableList<Data.Proxy.Entity> entities)
         {
             _cmd = cmd;
-            _root = root;
             
             entities.ForEach(CreateStation);
             entities.ObserveAdd().Subscribe(addEvent => CreateStation(addEvent.Value));
@@ -41,18 +35,12 @@ namespace Service
 
         private void CreateStation(Data.Proxy.Entity entity)
         {
-            if (entity is not Data.Proxy.Station station) return;
-            var vm = new StationVm(station);
-            _stationsVmsMap.Add(vm.ID, vm);
-            _root.AddWorld(vm);
+            
         }
 
         private void DestroyStation(Data.Proxy.Entity entity)
         {
-            if (entity is not Data.Proxy.Station station) return;
-            var vm = _stationsVmsMap[station.ID];
-            _stationsVmsMap.Remove(station.ID);
-            _root.RemoveWorld(vm);
+            
         }
     }
 }
