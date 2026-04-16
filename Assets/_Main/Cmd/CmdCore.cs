@@ -8,7 +8,7 @@ namespace Cmd
     { public bool Handle(TCommand command); }
 
     public abstract class Command {}
-    public abstract class Command<T> : Command
+    public abstract class ResultCommand<T> : Command
     { public T Result { get; set; } }
 
     public class CommandProcessor : IDisposable

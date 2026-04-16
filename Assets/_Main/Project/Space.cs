@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using View.Entity;
 using View.UIElement;
 using Object = UnityEngine.Object;
 
@@ -33,6 +34,22 @@ namespace Space
 
     public class World
     {
+        private readonly Transform _wordSpace;
         
+        public World()
+        {
+            var space = new GameObject("[WORLD]");
+            _wordSpace = space.transform;
+        }
+        
+        public void AddEntity<T>(T entityVm) where T : EntityVm
+        {
+            entityVm.OnAdd(_wordSpace);
+        }
+
+        public void RemoveEntity<T>(T entityVm) where T : EntityVm
+        {
+            entityVm.OnRemove();
+        }
     }
 }

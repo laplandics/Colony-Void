@@ -3,7 +3,7 @@ using System.Collections;
 using Constant;
 using Data.Proxy;
 using R3;
-using Tools;
+using Tools.Cam;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -50,14 +50,17 @@ namespace Utils
 
     public class Cam : IDisposable
     {
+        private readonly Inputs _inputs;
         private readonly Preferences _prefs;
         private CompositeDisposable _disposables = new();
         
-        public GameObject GetObject { get; private set; }
+        public GameObject GetCamContainer { get; private set; }
         public Camera GetCamera { get; private set; }
+        public CameraController GetCamController { get; private set; }
         
-        public Cam(Preferences prefs = null)
+        public Cam(Inputs inputs, Preferences prefs)
         {
+            _inputs = inputs;
             _prefs = prefs;
         }
         
@@ -67,13 +70,15 @@ namespace Utils
             const string directory = Paths.CAMERA_DIRECTORY_PATH;
             var path = directory + camName;
             var camPref = Resources.Load<GameObject>(path);
-            GetObject = Object.Instantiate(camPref);
-            GetObject.name = camName;
-            GetCamera = GetObject.GetComponentInChildren<Camera>();
+            GetCamContainer = Object.Instantiate(camPref);
+            GetCamContainer.name = camName;
+            GetCamera = GetCamContainer.GetComponentInChildren<Camera>();
             GetCamera.tag = "MainCamera";
             Resources.UnloadUnusedAssets();
-            if (GetObject.TryGetComponent<CameraController>(out var controller))
-            { InitializeController(controller); }
+            
+            if (!GetCamContainer.TryGetComponent<CameraController>(out var controller)) return;
+            InitializeController(controller);
+            GetCamController = controller;
         }
 
         private void InitializeController(CameraController controller)
@@ -83,12 +88,56 @@ namespace Utils
             _disposables.Add(_prefs.CamRotateSpeed.Subscribe(value => controller.rotateSpeed = value));
             _disposables.Add(_prefs.CamZoomSpeed.Subscribe(value => controller.zoomSpeed = value));
             _disposables.Add(_prefs.CamZoomConstrains.Subscribe(value => controller.zoomConstrains = value));
+            controller.Init(_inputs, GetCamera);
         }
 
         public void Dispose()
         {
             _disposables.Dispose();
-            Object.Destroy(GetObject);
+            Object.Destroy(GetCamContainer);
+        }
+    }
+
+    public class Grid
+    {
+        public enum GridSize { Grid1X1, Grid3X3 }
+        
+        private readonly int _cellSize;
+        
+        public Grid(GridSize size)
+        {
+            _cellSize = size switch
+            {
+                GridSize.Grid1X1 => Values.GRID_CELL_SIZE_SMALL,
+                GridSize.Grid3X3 => Values.GRID_CELL_SIZE_BIG,
+                _ => 1
+            };
+        }
+        
+        public Vector2Int GetCellIndex(Vector3 position)
+        {
+            var x = Mathf.FloorToInt(position.x / _cellSize);
+            var y = Mathf.FloorToInt(position.z / _cellSize);
+            
+            return new Vector2Int(x, y);
+        }
+
+        public Vector3 GetCellOrigin(Vector2Int cellIndex)
+        {
+            var x = cellIndex.x * _cellSize;
+            var z = cellIndex.y * _cellSize;
+            
+            return new Vector3(x, 0f, z);
+        }
+
+        public Vector3 GetCellCenter(Vector2Int cellIndex)
+        {
+            var half = _cellSize / 2f;
+
+            var x = cellIndex.x * _cellSize + half;
+            var z = cellIndex.y * _cellSize + half;
+
+            return new Vector3(x, 0f, z);
         }
     }
 }

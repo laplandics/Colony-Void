@@ -18,6 +18,7 @@ namespace View.UIElement
         private readonly ObservableList<UIElementVm> _windows = new();
         
         private readonly Dictionary<UIElementVm, IDisposable> _closeSubscriptionsMap = new();
+        private readonly Dictionary<string, UIElementVm> _taggedWindowsMap = new();
         
         public UIRootBinder Binder { get; private set; }
         public ReadOnlyReactiveProperty<UIElementVm> Screen => _screen;
@@ -40,9 +41,15 @@ namespace View.UIElement
 
         public void OnRemove()
         {
-            CloseAll();
+            foreach (var token in _tokens) { DisposeUIElement(token); }
+            _tokens.Clear();
+            
+            foreach (var window in _windows) { DisposeUIElement(window); }
+            _windows.Clear();
+            
             _screen.Value?.OnRemove();
             _screen.Value = null;
+            
             Binder.Unbind();
             Object.Destroy(Binder.gameObject);
         }
@@ -85,26 +92,6 @@ namespace View.UIElement
             if (window == null) return;
             _windows.Remove(window);
             DisposeUIElement(window);
-        }
-
-        protected void CloseAllTokens()
-        {
-            foreach (var token in _tokens)
-            { DisposeUIElement(token); }
-            _tokens.Clear();
-        }
-
-        protected void CloseAllWindows()
-        {
-            foreach (var window in _windows)
-            { DisposeUIElement(window); }
-            _windows.Clear();
-        }
-
-        protected void CloseAll()
-        {
-            CloseAllTokens();
-            CloseAllWindows();
         }
         
         private void DisposeUIElement(UIElementVm elementVm)

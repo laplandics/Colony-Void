@@ -18,10 +18,5 @@ namespace View.UIElement.Game
         {
             _root.OpenWindowGameMenu();
         }
-
-        public void InvokeCloseWindowGameMenu()
-        {
-            _root.CloseWindowGameMenu();
-        }
     }
 }

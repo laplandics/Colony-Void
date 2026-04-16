@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e184d21e0434115bb9dd81769e2bf76, type: 3}
   m_Name: ProjectSettings
   m_EditorClassIdentifier: Assembly-CSharp::Settings.ProjectSettings
-  initialEntities:
-  - {fileID: 11400000, guid: eee07569a0f07ec4294622349aba5265, type: 2}
+  initialEntities: []
+  initialResources: []

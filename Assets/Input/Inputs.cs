@@ -221,6 +221,34 @@ public partial class @Inputs: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 }
             ]
+        },
+        {
+            ""name"": ""Entity"",
+            ""id"": ""2da22e8f-ba2e-47aa-8099-7d56ee30c3cb"",
+            ""actions"": [
+                {
+                    ""name"": ""Select"",
+                    ""type"": ""Button"",
+                    ""id"": ""287f51a8-bce9-4beb-8a0b-dbee2a96b04f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""a494b693-1eb7-450e-b7ff-4701d1b5dba6"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Select"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -230,11 +258,15 @@ public partial class @Inputs: IInputActionCollection2, IDisposable
         m_Camera_Move = m_Camera.FindAction("Move", throwIfNotFound: true);
         m_Camera_Rotate = m_Camera.FindAction("Rotate", throwIfNotFound: true);
         m_Camera_Zoom = m_Camera.FindAction("Zoom", throwIfNotFound: true);
+        // Entity
+        m_Entity = asset.FindActionMap("Entity", throwIfNotFound: true);
+        m_Entity_Select = m_Entity.FindAction("Select", throwIfNotFound: true);
     }
 
     ~@Inputs()
     {
         UnityEngine.Debug.Assert(!m_Camera.enabled, "This will cause a leak and performance issues, Inputs.Camera.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_Entity.enabled, "This will cause a leak and performance issues, Inputs.Entity.Disable() has not been called.");
     }
 
     /// <summary>
@@ -424,6 +456,102 @@ public partial class @Inputs: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="CameraActions" /> instance referencing this action map.
     /// </summary>
     public CameraActions @Camera => new CameraActions(this);
+
+    // Entity
+    private readonly InputActionMap m_Entity;
+    private List<IEntityActions> m_EntityActionsCallbackInterfaces = new List<IEntityActions>();
+    private readonly InputAction m_Entity_Select;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "Entity".
+    /// </summary>
+    public struct EntityActions
+    {
+        private @Inputs m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public EntityActions(@Inputs wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "Entity/Select".
+        /// </summary>
+        public InputAction @Select => m_Wrapper.m_Entity_Select;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_Entity; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="EntityActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(EntityActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="EntityActions" />
+        public void AddCallbacks(IEntityActions instance)
+        {
+            if (instance == null || m_Wrapper.m_EntityActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_EntityActionsCallbackInterfaces.Add(instance);
+            @Select.started += instance.OnSelect;
+            @Select.performed += instance.OnSelect;
+            @Select.canceled += instance.OnSelect;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="EntityActions" />
+        private void UnregisterCallbacks(IEntityActions instance)
+        {
+            @Select.started -= instance.OnSelect;
+            @Select.performed -= instance.OnSelect;
+            @Select.canceled -= instance.OnSelect;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="EntityActions.UnregisterCallbacks(IEntityActions)" />.
+        /// </summary>
+        /// <seealso cref="EntityActions.UnregisterCallbacks(IEntityActions)" />
+        public void RemoveCallbacks(IEntityActions instance)
+        {
+            if (m_Wrapper.m_EntityActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="EntityActions.AddCallbacks(IEntityActions)" />
+        /// <seealso cref="EntityActions.RemoveCallbacks(IEntityActions)" />
+        /// <seealso cref="EntityActions.UnregisterCallbacks(IEntityActions)" />
+        public void SetCallbacks(IEntityActions instance)
+        {
+            foreach (var item in m_Wrapper.m_EntityActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_EntityActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="EntityActions" /> instance referencing this action map.
+    /// </summary>
+    public EntityActions @Entity => new EntityActions(this);
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Camera" which allows adding and removing callbacks.
     /// </summary>
@@ -452,5 +580,20 @@ public partial class @Inputs: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnZoom(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Entity" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="EntityActions.AddCallbacks(IEntityActions)" />
+    /// <seealso cref="EntityActions.RemoveCallbacks(IEntityActions)" />
+    public interface IEntityActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "Select" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSelect(InputAction.CallbackContext context);
     }
 }

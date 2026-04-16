@@ -1,6 +1,7 @@
 ﻿using Constant;
 using R3;
 using Space;
+using UnityEngine;
 using Utils;
 using View.UIElement.Menu;
 
@@ -15,6 +16,7 @@ namespace Boot
             c.Resolve<UI>().AddRoot(new MenuRootVm(exitSubject)).OpenMenuScreen();
             c.Resolve<Cam>().Instantiate(Enums.Cameras.MenuCam);
             
+            Resources.UnloadUnusedAssets();
             onExit = exitSubject;
         }
     }

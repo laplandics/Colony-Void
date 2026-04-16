@@ -3,7 +3,7 @@ using Constant;
 using ObservableCollections;
 using UnityEngine;
 
-namespace Cmd
+namespace Cmd.Resource
 {
     public class CmdCommandEarnResource : Command
     {

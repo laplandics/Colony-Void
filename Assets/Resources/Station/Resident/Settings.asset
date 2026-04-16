@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Settings.StationSettings
   entityType: 0
   stationType: 9
+  stationModules:
+  - moduleKey: 1
+    moduleStatus: 1

@@ -11,6 +11,7 @@
         
         public enum Entities
         {
+            //Stations
             Station,
         }
         
@@ -43,7 +44,8 @@
             //Token
             
             //Window
-            GameWindowGameMenu = 40
+            GameWindowGameMenu = 40,
+            GameWindowStationMenu = 41,
             
         }
         
@@ -69,6 +71,12 @@
             Weapon,
             BuildingMaterial,
             GeneralGood
+        }
+
+        public enum Modules
+        {
+            DragModule,
+            SelectionModule,
         }
     }
 }

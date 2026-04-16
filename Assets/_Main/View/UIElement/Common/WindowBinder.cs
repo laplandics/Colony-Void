@@ -11,15 +11,15 @@ namespace View.UIElement
         
         private void Start()
         {
-            dragModule.OwnerRect = GetComponent<RectTransform>();
-            dragModule.Activate();
+            dragModule.Initialize(GetComponent<RectTransform>());
+            dragModule.ModuleStatus = true;
             closeButton.onClick.AddListener(OnCloseButtonClicked);
         }
         
         protected virtual void OnCloseButtonClicked()
         {
             closeButton.onClick.RemoveListener(OnCloseButtonClicked);
-            dragModule.Deactivate();
+            dragModule.ModuleStatus = false;
             Vm.InvokeClose();
         }
     }

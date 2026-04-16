@@ -33,13 +33,6 @@ namespace Data
                 ? JsonConvert.DeserializeObject<State.Project>(File.ReadAllText(Path))
                 : CreateProjectState();
             
-#if UNITY_EDITOR
-            
-            Debug.LogWarning("Remove temporal editor code (Reset state)");
-            state = CreateProjectState();
-            
-#endif
-            
             Project = new Proxy.Project(state);
             return SaveData();
         }

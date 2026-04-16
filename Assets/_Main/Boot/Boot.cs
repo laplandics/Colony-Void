@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
 using Cmd;
+using Cmd.Entity;
+using Cmd.Resource;
+using Cmd.Station;
 using Constant;
 using Data;
 using R3;
@@ -23,16 +26,18 @@ namespace Boot
             var di = new DI();
             di.Register(_ => new UI(), true);
             di.Register(_ => new Scenes(), true);
+            di.Register(_ => new Inputs(), true);
             di.Register(_ => new Coroutines(), true);
             di.Register(_ => new CommandProcessor(), true);
             di.Register<ISettingsProvider>(_ => new SoSettingsProvider(), true);
             di.Register(_ => new Initializer(di.Resolve<ISettingsProvider>()), true);
-            di.Register(_ => new Cam(di.Resolve<IDataProvider>().Project.Preferences), true);
+            di.Register(_ => new Cam(di.Resolve<Inputs>(), di.Resolve<IDataProvider>().Project.Preferences), true);
             di.Register<IDataProvider>(_ => new JsonDataProvider(di.Resolve<Initializer>()), true);
-    
-#if UNITY_EDITOR
-                
-            Debug.LogWarning("Remove temporal editor code (Boot scene)");
+            
+            // Remove temporal editor code
+            #if UNITY_EDITOR
+            
+            Debug.LogWarning("Remove temporal editor code (Switch to active scene)");
             var sceneName = SceneManager.GetActiveScene().name;
             switch (sceneName)
             {
@@ -44,8 +49,9 @@ namespace Boot
             }
 
             if (sceneName != Names.Scenes.BOOT) return;
-                
-#endif
+            
+            #endif
+            //
             
             di.Resolve<Coroutines>().Start(LoadMenu(di), out _);
         }
@@ -66,10 +72,16 @@ namespace Boot
             var preferences = rootDi.Resolve<IDataProvider>().Project.Preferences;
             QualitySettings.vSyncCount = preferences.VSync.Value;
             Application.targetFrameRate = preferences.FPS.Value;
+
+            rootDi.Resolve<CommandProcessor>().Register(new CmdHandlerSelectEntity(
+                rootDi.Resolve<IDataProvider>().Project.Entities));
+            rootDi.Resolve<CommandProcessor>().Register(new CmdHandlerDeselectEntity(
+                rootDi.Resolve<IDataProvider>().Project.Entities));
+            
+            rootDi.Resolve<CommandProcessor>().Register(new CmdHandlerRemoveEntity(
+                rootDi.Resolve<IDataProvider>().Project.Entities));
             
             rootDi.Resolve<CommandProcessor>().Register(new CmdHandlerAddStation(
-                rootDi.Resolve<IDataProvider>().Project.Entities));
-            rootDi.Resolve<CommandProcessor>().Register(new CmdHandlerRemoveStation(
                 rootDi.Resolve<IDataProvider>().Project.Entities));
             
             rootDi.Resolve<CommandProcessor>().Register(new CmdHandlerEarnResource(
@@ -83,6 +95,7 @@ namespace Boot
         
         private IEnumerator BeforeEveryLoad(DI rootDi, string sceneName)
         {
+            rootDi.Resolve<Inputs>().Disable();
             if (!_isProjectInitialized) yield return BeforeFirstLoad(rootDi);
             
             rootDi.Dispose();
@@ -94,7 +107,9 @@ namespace Boot
             yield return new WaitForSeconds(0.2f);
             yield return Scenes.Load(sceneName);
             
+            Resources.UnloadUnusedAssets();
             yield return null;
+            rootDi.Resolve<Inputs>().Enable();
         }
         
         private IEnumerator LoadMenu(DI rootDi)

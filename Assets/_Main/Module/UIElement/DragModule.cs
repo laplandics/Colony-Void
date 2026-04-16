@@ -1,59 +1,56 @@
-﻿using UnityEngine;
+﻿using Constant;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Module.UIElement
 {
     public class DragModule : MonoBehaviour, IModule, IBeginDragHandler, IDragHandler
     {
-        public RectTransform OwnerRect { get; set; }
-        
+        private RectTransform _ownerRect;
         private Canvas _canvas;
-        private bool _isDragging;
-        
+
         private float _screenWidth;
         private float _screenHeight;
         private float _ownerWidth;
         private float _ownerHeight;
-        
-        public void Activate()
-        {
-            _canvas = GetComponentInParent<Canvas>();
-            _isDragging = true;
-        }
 
-        public void Deactivate()
+        public Enums.Modules ModuleKey => Enums.Modules.DragModule;
+        public bool ModuleStatus { get; set; }
+
+        public void Initialize(RectTransform ownerRect)
         {
-            _isDragging = false;
+            _ownerRect = ownerRect;
+            _canvas = GetComponentInParent<Canvas>();
         }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if (!_isDragging) return;
+            if (!ModuleStatus) return;
             _screenWidth = Screen.width;
             _screenHeight = Screen.height;
-            _ownerWidth = OwnerRect.rect.width;
-            _ownerHeight = OwnerRect.rect.height;
-            OwnerRect.SetAsLastSibling();
+            _ownerWidth = _ownerRect.rect.width;
+            _ownerHeight = _ownerRect.rect.height;
+            _ownerRect.SetAsLastSibling();
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (!_isDragging) return;
+            if (!ModuleStatus) return;
             var dragValue = eventData.delta / _canvas.scaleFactor;
             
-            if (OwnerRect.anchoredPosition.x < 0)
+            if (_ownerRect.anchoredPosition.x < 0)
             { if (dragValue.x < 0) dragValue.x = 0; }
             
-            if (OwnerRect.anchoredPosition.y < 0)
+            if (_ownerRect.anchoredPosition.y < 0)
             { if (dragValue.y < 0) dragValue.y = 0; }
 
-            if (OwnerRect.anchoredPosition.x > _screenWidth - _ownerWidth)
+            if (_ownerRect.anchoredPosition.x > _screenWidth - _ownerWidth)
             { if (dragValue.x > 0) dragValue.x = 0; }
             
-            if (OwnerRect.anchoredPosition.y > _screenHeight - _ownerHeight)
+            if (_ownerRect.anchoredPosition.y > _screenHeight - _ownerHeight)
             { if (dragValue.y > 0) dragValue.y = 0; }
             
-            OwnerRect.anchoredPosition += dragValue;
+            _ownerRect.anchoredPosition += dragValue;
         }
     }
 }

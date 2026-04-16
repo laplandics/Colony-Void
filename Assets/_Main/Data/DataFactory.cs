@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Constant;
 using Settings;
 using UnityEngine;
@@ -14,12 +15,18 @@ namespace Data
                 case Enums.Entities.Station:
                     if (settings is not StationSettings stationSettings)
                         throw new Exception($"Invalid entity type: {settings.entityType}");
+                    var stationModules = new Dictionary<Enums.Modules, bool>();
+                    foreach (var stationModuleSettings in stationSettings.stationModules)
+                    { stationModules.Add(stationModuleSettings.moduleKey, stationModuleSettings.moduleStatus); }
                     var stationState = new State.Station
                     {
                         ID = Guid.NewGuid().ToString(),
-                        Position = Vector3.zero,
                         Type = settings.entityType,
+                        Position = Vector3.zero,
+                        IsSelected = false,
+                        Modules =  stationModules,
                         StationType = stationSettings.stationType,
+                        CellIndex = Vector2Int.zero
                     };
                     return stationState;
                 

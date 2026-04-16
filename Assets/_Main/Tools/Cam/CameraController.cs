@@ -1,33 +1,42 @@
 ﻿using System.Collections;
+using Inspector;
 using Unity.Cinemachine;
 using UnityEngine;
 
-namespace Tools
+namespace Tools.Cam
 {
     public class CameraController : MonoBehaviour
     {
-        public float moveSpeed;
-        public float rotateSpeed;
-        public float zoomSpeed;
-        public Vector2Int zoomConstrains;
+        [ReadOnly] public float moveSpeed;
+        [ReadOnly] public float rotateSpeed;
+        [ReadOnly] public float zoomSpeed;
+        [ReadOnly] public Vector2Int zoomConstrains;
         
         [SerializeField] private Transform cameraTransform;
         [SerializeField] private CinemachineOrbitalFollow orbitalFollow;
         [SerializeField] private CinemachineInputAxisController inputAxis;
+        [Space]
+        [SerializeField] private GridCursor gridCursor;
+        
         private Coroutine _moveCoroutine;
         private Inputs _inputs;
         
-        private void Start()
+        public GridCursor GridCursor => gridCursor;
+
+        public void Init(Inputs inputs, Camera cam)
         {
-            _inputs = new Inputs();
+            _inputs = inputs;
             _inputs.Camera.Move.Enable();
             _inputs.Camera.Rotate.Enable();
             _inputs.Camera.Zoom.Enable();
             _moveCoroutine = StartCoroutine(Move());
+            
+            gridCursor.Initialize(cam);
         }
         
         private IEnumerator Move()
         {
+            gridCursor.Enable();
             while (true)
             {
                 transform.position += GetDirection() * (moveSpeed * Time.deltaTime);
@@ -77,6 +86,7 @@ namespace Tools
                     _disableRotationInputAfterButtonReleased = false;
                     inputAxis.enabled = true;
                     _isRotating = true;
+                    gridCursor.Disable();
                 }
             }
             
@@ -98,6 +108,7 @@ namespace Tools
             {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
+                gridCursor.Enable();
             }
             
             inputAxis.Controllers[0].Input.Gain = rotateSpeed;
